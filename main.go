@@ -54,15 +54,27 @@ func register(c *fiber.Ctx) error {
 }
 
 
-func verifyUser(user, email, password string) bool {
-	
+func verifyUser(login, password string) bool {
+	for _, x := range Users {
+		if(x.User == login || x.Email == login) {
+			if(x.Password == password) {
+				return true;
+			} else {
+				return false;
+			}
+		} else { 
+			return false;
+		}
+	}
+
+	return true;
 }
+
 
 func login(c *fiber.Ctx) error {
 	c.Response().Header.Set("Content-Type", "application/json")
 	payload := struct {
-        User  string 
-        Email string 
+        Login  string 
 		Password string 
     }{}
 
@@ -70,8 +82,8 @@ func login(c *fiber.Ctx) error {
 		log.Fatal(err)
 	}
 
-	if (verifyUser(payload.User, payload.Email, payload.Password)) {
-		fmt.Println("Login sucessfuly! - pt2")
+	if (verifyUser(payload.Login, payload.Password)) {
+		fmt.Println("Login sucessfuly!")
 	} else {
 		fmt.Println("Login failed!")
 	}
@@ -83,6 +95,6 @@ func main() {
 	app := fiber.New()
 	app.Get("/", handler)
 	app.Post("/register", register)
-	app.Get("/login")
+	app.Get("/login", login)
 	app.Listen(":8080")
 }
