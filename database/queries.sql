@@ -1,0 +1,13 @@
+-- name: InsertUser :exec
+INSERT INTO USERS(USERNAME, EMAIL, USER_PASSWORD) VALUES (?,?,?);
+
+-- name: GetUsers :one
+SELECT * FROM USERS WHERE USERNAME LIKE (?) OR EMAIL LIKE (?);
+
+-- name: DeleteUser :exec
+DELETE FROM USERS WHERE USERNAME LIKE (?) OR EMAIL LIKE (?);
+
+-- name: UpdateUser :exec
+UPDATE USERS 
+SET USERNAME = (?), EMAIL = (?), USER_PASSWORD = (?)
+WHERE USERNAME LIKE (?) OR EMAIL LIKE (?)
