@@ -7,6 +7,7 @@ import (
 	"log"
 	"modules/internal/db"
 	"strings"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
 )
@@ -20,6 +21,17 @@ func handler(c *fiber.Ctx) error {
 	return nil
 }
 
+var loadStruct struct {
+	User string
+	Email string
+	Password string
+}
+
+var loginStruct struct {
+	Login string
+	Password string
+}
+
 type Account struct {
 	User string `json:"user"`
 	Email string `json:"email"`
@@ -28,13 +40,18 @@ type Account struct {
 
 var Users []Account
 
-func logon(user, email, password string) {
-    dbconn, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/CRUD_LOGIN")
+func databaseConnect() *db.Queries{
+	dbconn, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/CRUD_LOGIN")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer dbconn.Close()
 	database := db.New(dbconn);
+	return database;
+}
+
+func logon(user, email, password string) {
+
+	database := databaseConnect();
 	newUser, err_ := database.GetUsers(context.Background(), db.GetUsersParams{user, email})
 	if err_ != nil {
 		fmt.Println(err_)
@@ -51,30 +68,8 @@ func logon(user, email, password string) {
 }
 
 
-func register(c *fiber.Ctx) error {
-	c.Response().Header.Set("Content-Type", "application/json")
-	payload := struct {
-        User  string 
-        Email string 
-		Password string 
-    }{}
-
-	if err := c.BodyParser(&payload); err != nil {
-		log.Fatal(err)
-	}
-	logon(payload.User, payload.Email, payload.Password)
-	return nil
-	
-}
-
-
 func verifyUser(login, password string) bool{
-	dbconn, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/CRUD_LOGIN")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer dbconn.Close()
-	database := db.New(dbconn);
+	database := databaseConnect();
 	user, err_ := database.GetUsers(context.Background(), db.GetUsersParams{login, login})
 	if err_ != nil {
 		fmt.Println(err_)
@@ -94,24 +89,25 @@ func verifyUser(login, password string) bool{
 	return false;
 }
 
+func register(c *fiber.Ctx) error {
+	c.Response().Header.Set("Content-Type", "application/json")
+	payload := loadStruct
+	if err := c.BodyParser(&payload); err != nil {
+		log.Fatal(err)
+	}
+	logon(payload.User, payload.Email, payload.Password)
+	return nil
+	
+}
+
 func deleteUser(c *fiber.Ctx) error {
 	c.Response().Header.Set("Content-Type", "application/json")
-	payload := struct {
-        Login  string 
-		Password string 
-    }{}
+	payload := loginStruct
 	if err := c.BodyParser(&payload); err != nil {
 		log.Fatal(err)
 	}
 
-	dbconn, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/CRUD_LOGIN")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer dbconn.Close()
-	database := db.New(dbconn);
-	
-
+	database := databaseConnect();
 	if(verifyUser(payload.Login, payload.Password)) {
 		database.DeleteUser(context.Background(), db.DeleteUserParams{payload.Login, payload.Login})
 		fmt.Println("User deleted!")
@@ -124,24 +120,20 @@ func deleteUser(c *fiber.Ctx) error {
 func updateUser(c *fiber.Ctx) error {
 	c.Response().Header.Set("Content-Type", "application/json")
 	payload := struct {
-        Login  string 
+		User string
 		Email string
-		Password string 
-    }{}
+		Password string
+		NewUser string
+		NewEmail string
+		NewPassword string
+	}{}
 	if err := c.BodyParser(&payload); err != nil {
 		log.Fatal(err)
 	}
 
-	dbconn, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/CRUD_LOGIN")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer dbconn.Close()
-	database := db.New(dbconn);
-	
-
-	if(verifyUser(payload.Login, payload.Password)) {
-		database.UpdateUser(context.Background(), db.UpdateUserParams{payload.Login, payload.Email, payload.Password, payload.Login, payload.Email})
+	database := databaseConnect();
+	if(verifyUser(payload.User, payload.Password)) {
+		database.UpdateUser(context.Background(), db.UpdateUserParams{payload.NewUser, payload.NewEmail, payload.NewPassword, payload.User, payload.Email})
 		fmt.Println("User updated!")
 	} else {
 		fmt.Println("Error!")
@@ -152,10 +144,7 @@ func updateUser(c *fiber.Ctx) error {
 
 func login(c *fiber.Ctx) error {
 	c.Response().Header.Set("Content-Type", "application/json")
-	payload := struct {
-        Login  string 
-		Password string 
-    }{}
+	payload := loginStruct
 
 	if err := c.BodyParser(&payload); err != nil {
 		log.Fatal(err)
@@ -164,7 +153,6 @@ func login(c *fiber.Ctx) error {
 		fmt.Println("Login sucessfully!")
 	}
 
-	
 	return nil
 }
 
