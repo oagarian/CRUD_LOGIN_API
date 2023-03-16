@@ -3,7 +3,10 @@
 ## How to run:
 ```sh
   go mod tidy
-  go run *.go
+  
+  cd src
+	
+  go run main.go
 ```
 
 ### The API server will start on: 
