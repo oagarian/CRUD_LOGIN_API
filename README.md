@@ -7,7 +7,6 @@
   cd src
   
   go run *.go 
-  (or go run ./)
 ```
 
 ### The API server will start on: 
