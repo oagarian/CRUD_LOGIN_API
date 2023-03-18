@@ -5,9 +5,16 @@
   cd src
   
   go mod tidy
+<<<<<<< HEAD
 
   go run *.go 
   (or go run ./)
+=======
+  
+  cd src
+	
+  go run main.go
+>>>>>>> 6b18087c34b9f098dc1914c22f3bac4a0e6f880f
 ```
 
 ### The API server will start on: 
