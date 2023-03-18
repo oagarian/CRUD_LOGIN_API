@@ -2,8 +2,12 @@
 
 ## How to run:
 ```sh
+  cd src
+  
   go mod tidy
-  go run *.go
+
+  go run *.go 
+  (or go run ./)
 ```
 
 ### The API server will start on: 
