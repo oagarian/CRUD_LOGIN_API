@@ -10,14 +10,6 @@ import (
 )
 
 
-func handler(c *fiber.Ctx) error {
-	c.Response().Header.Set("Content-Type", "application/json")
-	
-	fmt.Fprintf(c, "Arroba")
-	return nil
-}
-
-
 func register(c *fiber.Ctx) error {
 	c.Response().Header.Set("Content-Type", "application/json")
 	payload := loadStruct
@@ -88,7 +80,6 @@ func login(c *fiber.Ctx) error {
 
 func main() {
 	app := fiber.New()
-	app.Get("/", handler)
 	app.Post("/register", register)
 	app.Get("/login", login)
     app.Put("/update", updateUser)
