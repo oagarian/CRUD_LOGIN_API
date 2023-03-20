@@ -22,14 +22,6 @@ var loginStruct struct {
 	Password string
 }
 
-type Account struct {
-	User string `json:"user"`
-	Email string `json:"email"`
-	Password string `json:"password"`
-}
-
-var Users []Account
-
 func DatabaseConnect() *db.Queries{
 	dbconn, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/CRUD_LOGIN")
 	if err != nil {
