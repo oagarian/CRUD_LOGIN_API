@@ -41,8 +41,6 @@ func Logon(user, email, password string) {
 	if (strings.EqualFold(newUser.Email, email)) {
 		fmt.Println("A user with that email already exists")
 	} else {
-		fmt.Println(newUser.Email)
-		fmt.Println(email)
 		database.InsertUser(context.Background(), db.InsertUserParams{user, email, password});
 		fmt.Println("Logon sucessfuly!")
 	}
