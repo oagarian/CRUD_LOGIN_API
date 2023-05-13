@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"modules/internal/db"
@@ -17,7 +18,15 @@ func register(c *fiber.Ctx) error {
 		log.Fatal(err)
 	}
 	Logon(payload.User, payload.Email, payload.Password)
-	return nil
+	
+	jsonModel, err := json.Marshal(payload);
+	if err != nil {
+		log.Fatal(err)
+	}
+	return c.SendStatus(c.Response().StatusCode());
+
+	return c.JSON(jsonModel);
+
 	
 }
 
@@ -30,12 +39,12 @@ func deleteUser(c *fiber.Ctx) error {
 
 	database := DatabaseConnect();
 	if(VerifyUser(payload.Login, payload.Password)) {
-		database.DeleteUser(context.Background(), db.DeleteUserParams{payload.Login, payload.Login})
+		database.DeleteUser(context.Background(), db.DeleteUserParams{Username: payload.Login, Email: payload.Login})
 		fmt.Println("User deleted!")
 	} else {
 		fmt.Println("Error!")
 	}
-	return nil
+	return c.SendStatus(c.Response().StatusCode());
 }
 
 func updateUser(c *fiber.Ctx) error {
@@ -59,7 +68,16 @@ func updateUser(c *fiber.Ctx) error {
 	} else {
 		fmt.Println("Error!")
 	}
-	return nil
+
+	
+	return c.SendStatus(c.Response().StatusCode());
+
+	jsonModel, err := json.Marshal(payload);
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	return c.JSON(jsonModel);
 }
 
 
@@ -74,7 +92,12 @@ func login(c *fiber.Ctx) error {
 		fmt.Println("Login sucessfully!")
 	}
 
-	return nil
+	return c.SendStatus(c.Response().StatusCode());
+	jsonModel, err := json.Marshal(payload);
+	if err != nil {
+		log.Fatal(err)
+	}
+	return c.JSON(jsonModel);
 }
 
 
