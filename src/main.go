@@ -63,7 +63,7 @@ func updateUser(c *fiber.Ctx) error {
 
 	database := DatabaseConnect();
 	if(VerifyUser(payload.User, payload.Password)) {
-		database.UpdateUser(context.Background(), db.UpdateUserParams{payload.NewUser, payload.NewEmail, payload.NewPassword, payload.User, payload.Email})
+		database.UpdateUser(context.Background(), db.UpdateUserParams{Username: payload.NewUser, Email: payload.NewEmail, UserPassword: payload.NewPassword, Username_2: payload.User, Email_2: payload.Email})
 		fmt.Println("User updated!")
 	} else {
 		fmt.Println("Error!")
