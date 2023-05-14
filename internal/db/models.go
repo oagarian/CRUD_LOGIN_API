@@ -9,5 +9,7 @@ import ()
 type User struct {
 	Username     string
 	Email        string
+	IsAdmin      bool
 	UserPassword string
+	CreatedAt    string
 }

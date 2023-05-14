@@ -24,7 +24,7 @@ func (q *Queries) DeleteUser(ctx context.Context, arg DeleteUserParams) error {
 }
 
 const getUsers = `-- name: GetUsers :one
-SELECT username, email, user_password FROM USERS WHERE USERNAME LIKE (?) OR EMAIL LIKE (?)
+SELECT username, email, is_admin, user_password, created_at FROM USERS WHERE USERNAME LIKE (?) OR EMAIL LIKE (?)
 `
 
 type GetUsersParams struct {
@@ -35,23 +35,59 @@ type GetUsersParams struct {
 func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUsers, arg.Username, arg.Email)
 	var i User
-	err := row.Scan(&i.Username, &i.Email, &i.UserPassword)
+	err := row.Scan(
+		&i.Username,
+		&i.Email,
+		&i.IsAdmin,
+		&i.UserPassword,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
 const insertUser = `-- name: InsertUser :exec
-INSERT INTO USERS(USERNAME, EMAIL, USER_PASSWORD) VALUES (?,?,?)
+INSERT INTO USERS(USERNAME, EMAIL, IS_ADMIN, USER_PASSWORD, CREATED_AT) VALUES (?,?,?,?,?)
 `
 
 type InsertUserParams struct {
 	Username     string
 	Email        string
+	IsAdmin      bool
 	UserPassword string
+	CreatedAt    string
 }
 
 func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
-	_, err := q.db.ExecContext(ctx, insertUser, arg.Username, arg.Email, arg.UserPassword)
+	_, err := q.db.ExecContext(ctx, insertUser,
+		arg.Username,
+		arg.Email,
+		arg.IsAdmin,
+		arg.UserPassword,
+		arg.CreatedAt,
+	)
 	return err
+}
+
+const isAdmin = `-- name: IsAdmin :one
+SELECT username, email, is_admin, user_password, created_at FROm USERS WHERE USERNAME LIKE (?) OR EMAIL LIKE (?) AND IS_ADMIN = TRUE
+`
+
+type IsAdminParams struct {
+	Username string
+	Email    string
+}
+
+func (q *Queries) IsAdmin(ctx context.Context, arg IsAdminParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, isAdmin, arg.Username, arg.Email)
+	var i User
+	err := row.Scan(
+		&i.Username,
+		&i.Email,
+		&i.IsAdmin,
+		&i.UserPassword,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const updateUser = `-- name: UpdateUser :exec
