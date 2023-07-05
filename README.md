@@ -2,11 +2,12 @@
 
 ## How to run:
 ```sh
-  go mod tidy
-  
-  cd src
-  
-  go run *.go 
+  	git clone https://github.com/oagarian/CRUD_LOGIN_API.git
+	cd CRUD_LOGIN_API
+	
+  	go mod tidy
+  	cd src
+  	go run *.go 
 ```
 
 ### The API server will start on: 
